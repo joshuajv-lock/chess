@@ -1,1 +1,3 @@
 Practicing Git for CS 240
+
+"This is an updated part of the file"
