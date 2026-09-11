@@ -61,6 +61,26 @@ public class ChessPiece {
             calculator = new BishopMovesCalculator();
             return calculator.pieceMoves(board,myPosition);
         }
+        else if (piece.getPieceType() == PieceType.KING) {
+            calculator = new KingMovesCalculator();
+            return calculator.pieceMoves(board,myPosition);
+        }
+        else if (piece.getPieceType() == PieceType.QUEEN) {
+            calculator = new QueenMovesCalculator();
+            return calculator.pieceMoves(board, myPosition);
+        }
+        else if (piece.getPieceType() == PieceType.KNIGHT) {
+            calculator = new KnightMovesCalculator();
+            return calculator.pieceMoves(board, myPosition);
+        }
+        else if (piece.getPieceType() == PieceType.ROOK) {
+            calculator = new RookMovesCalculator();
+            return calculator.pieceMoves(board, myPosiiton);
+        }
+        else /*else means it's a pawn*/{
+            calculator = new PawnMovesCalculator();
+            return calculator.pieceMoves(board, myPosition);
+        }
         return List.of();
     }
 }
