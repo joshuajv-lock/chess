@@ -1,6 +1,8 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 import java.util.List;
 
@@ -23,6 +25,8 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         //row -1, col -1
         int[] row_directions = {1,-1};
         int[] col_directions = {1,-1};
+
+        Collection<ChessMove> possibleMoves = new ArrayList<>();
         for (int row_direction: row_directions){
             for (int col_direction: col_directions){
                 boolean expand = true;
@@ -32,7 +36,7 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                     //find next available move
                     int next_row = position.getRow() + row_direction *distance;
                     int next_col = position.getColumn() + col_direction *distance;
-                    distance += 1;
+
 
                     if ( next_row > 8 || next_col > 8 || next_row < 1 || next_col < 1 ){
                         //position is outside the board
@@ -42,17 +46,21 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
                         // get current chess position
                         ChessPosition nextPosition = new ChessPosition(next_row, next_col);
                         ChessPiece pieceInNextPosition = board.getPiece(nextPosition);
-                        if (/*square is empty*/) {
+                        if (pieceInNextPosition == null) {
                             /*add to collection of moves*/
-                            position = nextPosition
+                            possibleMoves.add(new ChessMove(position, nextPosition, null));
+                            distance += 1;
                         }
-                        else if (/*square holds own color*/) {
+                        else if (pieceInNextPosition.getTeamColor() !=null && pieceInNextPosition.getTeamColor() == board.getPiece(position).getTeamColor()) {
+
                             expand = false;
+
                         }
-                        else /*square holds enemy color*/ {
+                        else {
                             /*highlight as capture potential*/
                             /*add to collection of moves*/
-                            position = nextPosition
+                            possibleMoves.add(new ChessMove(position,nextPosition,null));
+                            expand = false;
                         }
                     }
                 }
@@ -60,6 +68,6 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
             }
         }
         //return that Collection of ChessMoves
-        return List.of();
+        return possibleMoves;
     }
 }
