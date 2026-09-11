@@ -21,24 +21,45 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
         //row +1, col -1
         //row -1, col +1
         //row -1, col -1
+        int[] row_directions = {1,-1};
+        int[] col_directions = {1,-1};
+        for (int row_direction: row_directions){
+            for (int col_direction: col_directions){
+                boolean expand = true;
+                int distance = 1;
+                while (expand) {
 
-        //for (each direction, check if its valid, move onto the next direction,)
-            //boolean expand = true;
+                    //find next available move
+                    int next_row = position.getRow() + row_direction *distance;
+                    int next_col = position.getColumn() + col_direction *distance;
+                    distance += 1;
 
-        //A bishop cannot:
-            //leave the 8x8 grid
-            //land on its own color piece
-            //pass through another piece in its path
+                    if ( next_row > 8 || next_col > 8 || next_row < 1 || next_col < 1 ){
+                        //position is outside the board
+                        expand = false;
+                    }
+                    else {
+                        // get current chess position
+                        ChessPosition nextPosition = new ChessPosition(next_row, next_col);
+                        ChessPiece pieceInNextPosition = board.getPiece(nextPosition);
+                        if (/*square is empty*/) {
+                            /*add to collection of moves*/
+                            position = nextPosition
+                        }
+                        else if (/*square holds own color*/) {
+                            expand = false;
+                        }
+                        else /*square holds enemy color*/ {
+                            /*highlight as capture potential*/
+                            /*add to collection of moves*/
+                            position = nextPosition
+                        }
+                    }
+                }
 
-        //a bishop must
-            //move diagonally
-
-        //if a bishop encounters another piece it must:
-            //stop and capture the piece then replace that piece
-
-        //build ChessMoves objects
-
+            }
+        }
         //return that Collection of ChessMoves
         return List.of();
-
     }
+}
