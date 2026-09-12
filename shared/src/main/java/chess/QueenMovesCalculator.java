@@ -4,26 +4,19 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
+public class QueenMovesCalculator implements PieceMovesCalculator {
 
-public class BishopMovesCalculator implements PieceMovesCalculator {
     private ChessBoard board;
     private ChessPosition position;
 
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
 
-        //now we figure out the valid bishop destinations
-        //get bishop starting position
         this.board = board;
         this.position = position;
-        //travel out one square at a time
-        //you need to define these four directions so a four loop can move through them
-        //row +1, col +1
-        //row +1, col -1
-        //row -1, col +1
-        //row -1, col -1
-        int[] row_directions = {1,-1};
-        int[] col_directions = {1,-1};
+
+        int[] row_directions = {0, 1, -1};
+        int[] col_directions = {0, 1,-1};
 
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         for (int row_direction: row_directions){
@@ -66,7 +59,8 @@ public class BishopMovesCalculator implements PieceMovesCalculator {
 
             }
         }
-        //return that Collection of ChessMoves
+
+
         return possibleMoves;
     }
 }
