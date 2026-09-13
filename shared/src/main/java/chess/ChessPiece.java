@@ -79,11 +79,10 @@ public class ChessPiece {
             calculator = new KnightMovesCalculator();
             return calculator.pieceMoves(board, myPosition);
         }
-        /**/
-        /*else else means it's a pawn{
+        else if (piece.getPieceType() == PieceType.PAWN) {
             calculator = new PawnMovesCalculator();
             return calculator.pieceMoves(board, myPosition);
-        }*/
+        }
         else {return List.of();}
     }
 }
