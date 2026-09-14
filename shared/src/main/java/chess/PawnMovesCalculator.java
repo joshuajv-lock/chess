@@ -20,65 +20,97 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         int coef = 1;
         ChessPiece piece = board.getPiece(position);
 
-        //piece is white
-        if (piece.getTeamColor() == ChessGame.TeamColor.WHITE){
+        //piece is BLACK
+        if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             coef = -1;
-
+        }
             //piece promotion probably needs to go here
+            // white on black end row and black on white end row
 
-            if ((position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE) || (position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK)) {
+        if ((position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
 
-                //if double move open
-                //double move creation
-                int moveTwoRows = position.getRow() +2 * coef;
-                ChessPosition nextPositionTwoMoves = new ChessPosition(moveTwoRows, position.getColumn());
-                ChessPiece pieceInNextPositionTwoMoves = board.getPiece(nextPositionTwoMoves);
-                //add the move if its open
-                if (pieceInNextPositionTwoMoves == null) {
-                    possibleMoves.add(new ChessMove(position, nextPositionTwoMoves, null));
-                }
-            else if ((position.getRow() == 1 && piece.getTeamColor() == ChessGame.TeamColor.WHITE) || (position.getRow() == 8 && piece.getTeamColor() == ChessGame.TeamColor.BLACK)) {
+            //if space in front is open
+            int moveOneRow = position.getRow() + 1 * coef;
+            ChessPosition nextPositionOneMove = new ChessPosition(moveOneRow, position.getColumn());
+            ChessPiece pieceInNextPositionOneMove = board.getPiece(nextPositionOneMove);
+            //if double move open
+            //double move creation
+            int moveTwoRows = position.getRow() + 2 * coef;
+            ChessPosition nextPositionTwoMoves = new ChessPosition(moveTwoRows, position.getColumn());
+            ChessPiece pieceInNextPositionTwoMoves = board.getPiece(nextPositionTwoMoves);
+            //add the move if its open
+            if (pieceInNextPositionTwoMoves == null &&  pieceInNextPositionOneMove == null) {
+                possibleMoves.add(new ChessMove(position, nextPositionTwoMoves, null));
+            }
+        }
+
+        /*regular decision tree for a pawn*/
+        //single move creation
+        int moveOneRow = position.getRow() + 1 * coef;
+        ChessPosition nextPositionOneMove = new ChessPosition(moveOneRow, position.getColumn());
+        ChessPiece pieceInNextPositionOneMove = board.getPiece(nextPositionOneMove);
+        //add the move if its open
+        if (pieceInNextPositionOneMove == null) {
+            if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
 
                 //piece promotion
-                return null;
+                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.QUEEN));
+                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.KNIGHT));
+                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.ROOK));
+                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.BISHOP));
+                //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.PAWN));
+                //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KING));
+
             }
-            else /*regular decision tree for a pawn*/ {
-                //single move creation
-                int moveOneRow = position.getRow() + 1 * coef;
-                ChessPosition nextPositionOneMove = new ChessPosition(moveOneRow, position.getColumn());
-                ChessPiece pieceInNextPositionOneMove = board.getPiece(nextPositionOneMove);
-                //add the move if its open
-                if (pieceInNextPositionOneMove == null) {
-                    possibleMoves.add(new ChessMove(position, nextPositionOneMove, null));
-                }
+            else {
+                possibleMoves.add(new ChessMove(position, nextPositionOneMove, null));
+            }
+        }
 
-                    // row +1 * coef and look at column + and -1
-                    //needs to be within board
-                    //can't be same team
-                    //so different team and null is alright
 
-                int[] nextColumns = {-1,1};
+                // row +1 * coef and look at column + and -1
+                //needs to be within board
+                //can't be same team
+                //so different team and null is alright
 
-                for (int nextColumn : nextColumns) {
-                    int nextRow = position.getRow() + coef;
-                    ChessPosition DiagPos = new ChessPosition(nextRow, nextColumn);
+        int[] nextColumns = {-1,1};
+
+        for (int nextColumn : nextColumns) {
+            int nextRow = position.getRow() + coef;
+            int nextCol = position.getColumn() + nextColumn;
+
+            if (nextRow <= 8 && nextCol <= 8 && nextRow >= 1 && nextCol >= 1) {
+                ChessPosition DiagPos = new ChessPosition(nextRow, nextCol);
+                if (board.getPiece(DiagPos) != null) {
                     ChessPiece pieceInDiagPos = board.getPiece(DiagPos);
-                    if (pieceInDiagPos.getTeamColor() != board.getPiece(position).getTeamColor() && pieceInDiagPos.getTeamColor() != null && DiagPos.getRow() < 8 && DiagPos.getColumn() < 8 && DiagPos.getRow() > 0 && DiagPos.getColumn() > 0) {
-                        //add the position
 
-                        possibleMoves.add(new ChessMove(position, DiagPos, null));
+                    if (pieceInDiagPos.getTeamColor() != board.getPiece(position).getTeamColor()) {
+                        //add the position
+                        if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+
+                            //piece promotion
+                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.QUEEN));
+                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KNIGHT));
+                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.ROOK));
+                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.BISHOP));
+                            //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.PAWN));
+                            //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KING));
+
+                        }
+                        else {possibleMoves.add(new ChessMove(position, DiagPos, null));}
                     }
+                    //for piece promotion
+
                     //position holds is off the board, holds self, or is null
                     else {
                         continue;
                     }
-                }
+                } else {
+                    continue;
                 }
 
             }
-
         }
-
         return  possibleMoves;
         }
         //color A increases coef = - otherwise keep it positive
