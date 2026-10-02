@@ -310,7 +310,7 @@ public class ChessGame {
     public void setBoard(ChessBoard board) {
         myBoard = board;
     }
-
+    //this is just me adding a comment because i need more commits for this one
     /**
      * Gets the current chessboard
      *
