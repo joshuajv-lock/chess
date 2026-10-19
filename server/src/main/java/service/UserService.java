@@ -64,4 +64,31 @@ public class UserService {
 
         //turn authdata to registerresult
     }
+
+    public LoginResult login(LoginRequest loginRequestObject) throws BadRequestException, UnauthorizedException{
+        if (loginRequestObject == null || loginRequestObject.username() == null || loginRequestObject.password() == null) {
+            throw new BadRequestException("the given login information is incomplete");
+        }
+
+        String givenUsername = loginRequestObject.username();
+        UserData possibleUser = userDAO.getUser(givenUsername);
+        if (possibleUser == null) {
+            throw new UnauthorizedException("we could not find an account with that username. would you like to create an account?");
+        }
+
+        //is the password the one that matches the username?
+
+        String givenPassword = loginRequestObject.password();
+        if (!givenPassword.equals(possibleUser.password())) {
+            throw new UnauthorizedException("the password doesn't match the one we have on file. would you like to recover your password?");
+        }
+        else {
+            String authToken = UUID.randomUUID().toString();
+            AuthData newAuth = new AuthData(authToken,givenUsername);
+            authDAO.createAuth(newAuth);
+            LoginResult myResult = new LoginResult(givenUsername,authToken);
+            return myResult;
+        }
+
+    }
 }
