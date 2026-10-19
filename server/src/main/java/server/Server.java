@@ -4,6 +4,7 @@ import dataaccess.AuthDAO;
 import dataaccess.MemoryAuthDAO;
 import dataaccess.MemoryUserDAO;
 import dataaccess.UserDAO;
+import handler.LoginHandler;
 import handler.RegisterHandler;
 import io.javalin.*;
 import service.UserService;
@@ -24,6 +25,12 @@ public class Server {
         RegisterHandler registerHandler = new RegisterHandler(userService);
 
         javalin.post("/user", ctx -> registerHandler.translate(ctx));
+
+        LoginHandler loginHandler = new LoginHandler(userService);
+
+        javalin.post("/session", ctx -> loginHandler.translate(ctx));
+
+
 
     }
 
