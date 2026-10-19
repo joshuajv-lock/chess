@@ -27,7 +27,7 @@ public class UserService {
         //check userdata for user name
 
         if (registerRequestObject == null || registerRequestObject.username() == null || registerRequestObject.password() == null || registerRequestObject.email() == null) {
-            throw new BadRequestException("the given register information is incomplete");
+            throw new BadRequestException("Error: the given register information is incomplete");
         }
 
 
@@ -36,7 +36,7 @@ public class UserService {
         UserData possibleUser = userDAO.getUser(givenUsername);
 
         if (possibleUser != null) {
-            throw new AlreadyTakenException("an account with this username already exists");
+            throw new AlreadyTakenException("Error: an account with this username already exists");
         }
 
 
@@ -67,20 +67,20 @@ public class UserService {
 
     public LoginResult login(LoginRequest loginRequestObject) throws BadRequestException, UnauthorizedException{
         if (loginRequestObject == null || loginRequestObject.username() == null || loginRequestObject.password() == null) {
-            throw new BadRequestException("the given login information is incomplete");
+            throw new BadRequestException("Error: the given login information is incomplete");
         }
 
         String givenUsername = loginRequestObject.username();
         UserData possibleUser = userDAO.getUser(givenUsername);
         if (possibleUser == null) {
-            throw new UnauthorizedException("we could not find an account with that username. would you like to create an account?");
+            throw new UnauthorizedException("Error: we could not find an account with that username. would you like to create an account?");
         }
 
         //is the password the one that matches the username?
 
         String givenPassword = loginRequestObject.password();
         if (!givenPassword.equals(possibleUser.password())) {
-            throw new UnauthorizedException("the password doesn't match the one we have on file. would you like to recover your password?");
+            throw new UnauthorizedException("Error: the password doesn't match the one we have on file. would you like to recover your password?");
         }
         else {
             String authToken = UUID.randomUUID().toString();
@@ -95,7 +95,7 @@ public class UserService {
         String authToken = logoutRequestObject.authToken();
         AuthData possibleAuth = authDAO.getAuth(authToken);
         if (possibleAuth == null) {
-            throw new UnauthorizedException("you are not authorized to logout");
+            throw new UnauthorizedException("Error: you are not authorized to logout");
         }
         else {
             authDAO.deleteAuth(authToken);

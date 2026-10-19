@@ -28,15 +28,15 @@ public class GameService {
     public CreateGameResult createGame (CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException{
         //authorize them
         if (createGameRequest == null) {
-            throw new BadRequestException("you must send a createGameRequest object");
+            throw new BadRequestException("Error: you must send a createGameRequest object");
         }
         String authToken = createGameRequest.authToken();
         AuthData possibleAuth = authDAO.getAuth(authToken);
         if (possibleAuth == null) {
-            throw new UnauthorizedException("you are not authorized to create a game");
+            throw new UnauthorizedException("Error: you are not authorized to create a game");
         }
         else if (createGameRequest.gameName() == null) {
-            throw new BadRequestException("you didn't give a gameName");
+            throw new BadRequestException("Error: you didn't give a gameName");
         }
         else {
             //create the game
@@ -59,12 +59,12 @@ public class GameService {
 
     public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException, BadRequestException {
         if (listGamesRequest == null) {
-            throw new BadRequestException("you must send a listGamesRequest object");
+            throw new BadRequestException("Error: you must send a listGamesRequest object");
         }
         String authToken = listGamesRequest.authToken();
         AuthData possibleAuth = authDAO.getAuth(authToken);
         if (possibleAuth == null) {
-            throw new UnauthorizedException("you are not authorized to list the stored games");
+            throw new UnauthorizedException("Error: you are not authorized to list the stored games");
         }
         Collection<GameData> myGames = new ArrayList<>();
         //totally not right just a framework
@@ -84,32 +84,32 @@ public class GameService {
     }
     public void joinGame(JoinGameRequest joinGameRequest) throws BadRequestException, UnauthorizedException, AlreadyTakenException{
         if (joinGameRequest == null) {
-            throw new BadRequestException("you must send a joinGameRequest object");
+            throw new BadRequestException("Error: you must send a joinGameRequest object");
         }
         String authToken = joinGameRequest.authToken();
         int gameID =  joinGameRequest.gameID();
         String playerColor = joinGameRequest.playerColor();
 
         if (authToken == null) {
-            throw new UnauthorizedException("you are not authorized to Join a game");
+            throw new UnauthorizedException("Error: you are not authorized to Join a game");
         }
         if (gameID <= 0 || playerColor == null) {
-            throw new BadRequestException("your JoinGame request did not have all the values we were looking for");
+            throw new BadRequestException("Error: your JoinGame request did not have all the values we were looking for");
         }
         GameData gameData = gameDAO.getGame(gameID);
         if (gameData == null) {
-            throw new BadRequestException("your game does not exist");
+            throw new BadRequestException("Error: your game does not exist");
         }
 
         AuthData authData = authDAO.getAuth(authToken);
         if (authData == null) {
-            throw new UnauthorizedException("you are not authorized to join a game");
+            throw new UnauthorizedException("Error: you are not authorized to join a game");
         }
         String authDatausername = authData.username();
 
         if ("WHITE".equals(playerColor)) {
             if (gameData.whiteUsername() != null) {
-                throw new AlreadyTakenException("there is already a player who has that color in that game");
+                throw new AlreadyTakenException("Error: there is already a player who has that color in that game");
             }
             else {
                 //get the game using game ID
@@ -120,7 +120,7 @@ public class GameService {
         }
         else if ("BLACK".equals(playerColor)) {
             if (gameData.blackUsername() != null) {
-                throw new AlreadyTakenException("there is already a player who has that color in that game");
+                throw new AlreadyTakenException("Error: there is already a player who has that color in that game");
             }
             else {
                 //get the game using game ID
@@ -130,7 +130,7 @@ public class GameService {
             }
         }
         else {
-            throw new BadRequestException("you can only have a black or white color in chess");
+            throw new BadRequestException("Error: you can only have a black or white color in chess");
         }
     }
 }
