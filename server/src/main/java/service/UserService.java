@@ -26,7 +26,7 @@ public class UserService {
         throws BadRequestException, AlreadyTakenException {
         //check userdata for user name
 
-        if (registerRequestObject.username() == null || registerRequestObject.password() == null || registerRequestObject.email() == null) {
+        if (registerRequestObject == null || registerRequestObject.username() == null || registerRequestObject.password() == null || registerRequestObject.email() == null) {
             throw new BadRequestException("the given register information is incomplete");
         }
 
@@ -41,18 +41,17 @@ public class UserService {
 
 
         //if null create a new one
-        if (possibleUser == null) {
-            UserData newUserData = new UserData(registerRequestObject.username(), registerRequestObject.password(), registerRequestObject.email());
-            userDAO.createUser(newUserData);
-            //create an authToken
-            String authToken = UUID.randomUUID().toString();
-            AuthData newAuthData = new AuthData(authToken,givenUsername);
-            authDAO.createAuth(newAuthData);
 
-            //turn authdata to registerresult
-            RegisterResult myResult = new RegisterResult(givenUsername,authToken);
-            return myResult;
-        }
+        UserData newUserData = new UserData(registerRequestObject.username(), registerRequestObject.password(), registerRequestObject.email());
+        userDAO.createUser(newUserData);
+        //create an authToken
+        String authToken = UUID.randomUUID().toString();
+        AuthData newAuthData = new AuthData(authToken,givenUsername);
+        authDAO.createAuth(newAuthData);
+
+        //turn authdata to registerresult
+        RegisterResult myResult = new RegisterResult(givenUsername,authToken);
+        return myResult;
 
         //if not null then return user already created error
 
