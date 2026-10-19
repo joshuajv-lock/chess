@@ -1,12 +1,13 @@
 package server;
 
-import dataaccess.AuthDAO;
-import dataaccess.MemoryAuthDAO;
-import dataaccess.MemoryUserDAO;
-import dataaccess.UserDAO;
+import dataaccess.*;
+import handler.CreateGameHandler;
 import handler.LoginHandler;
+import handler.LogoutHandler;
 import handler.RegisterHandler;
 import io.javalin.*;
+import service.GameService;
+import service.LogoutRequest;
 import service.UserService;
 
 public class Server {
@@ -19,8 +20,10 @@ public class Server {
         // Register your endpoints and exception handlers here.
         UserDAO userDAO = new MemoryUserDAO();
         AuthDAO authDAO = new MemoryAuthDAO();
+        GameDAO gameDAO = new MemoryGameDAO();
 
         UserService userService = new UserService(userDAO,authDAO);
+        GameService gameService = new GameService(authDAO,gameDAO);
 
         RegisterHandler registerHandler = new RegisterHandler(userService);
 
@@ -30,7 +33,13 @@ public class Server {
 
         javalin.post("/session", ctx -> loginHandler.translate(ctx));
 
+        LogoutHandler logoutHandler = new LogoutHandler(userService);
 
+        javalin.delete("/session", ctx -> logoutHandler.translate(ctx));
+
+        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+
+        javalin.post("/game", ctx -> createGameHandler.translate(ctx));
 
     }
 

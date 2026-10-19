@@ -91,4 +91,14 @@ public class UserService {
         }
 
     }
+    public void logout(LogoutRequest logoutRequestObject) throws UnauthorizedException {
+        String authToken = logoutRequestObject.authToken();
+        AuthData possibleAuth = authDAO.getAuth(authToken);
+        if (possibleAuth == null) {
+            throw new UnauthorizedException("you are not authorized to logout");
+        }
+        else {
+            authDAO.deleteAuth(authToken);
+        }
+    }
 }
