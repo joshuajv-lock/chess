@@ -1,10 +1,7 @@
 package server;
 
 import dataaccess.*;
-import handler.CreateGameHandler;
-import handler.LoginHandler;
-import handler.LogoutHandler;
-import handler.RegisterHandler;
+import handler.*;
 import io.javalin.*;
 import service.GameService;
 import service.LogoutRequest;
@@ -40,6 +37,10 @@ public class Server {
         CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
 
         javalin.post("/game", ctx -> createGameHandler.translate(ctx));
+
+        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+
+        javalin.get("/game", ctx -> listGamesHandler.translate(ctx));
 
     }
 

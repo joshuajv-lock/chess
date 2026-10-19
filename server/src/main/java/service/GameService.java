@@ -7,6 +7,8 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.UUID;
 
 import java.util.concurrent.atomic.AtomicInteger;
@@ -22,8 +24,6 @@ public class GameService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
-
-
 
     public CreateGameResult createGame (CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException{
         //authorize them
@@ -55,5 +55,33 @@ public class GameService {
         }
 
         //create the game
+    }
+
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException, BadRequestException {
+        if (listGamesRequest == null) {
+            throw new BadRequestException("you must send a listGamesRequest object");
+        }
+        String authToken = listGamesRequest.authToken();
+        AuthData possibleAuth = authDAO.getAuth(authToken);
+        if (possibleAuth == null) {
+            throw new UnauthorizedException("you are not authorized to list the stored games");
+        }
+        Collection<GameData> myGames = new ArrayList<>();
+        //totally not right just a framework
+
+        //list the games
+        myGames = gameDAO.listGames();
+
+        Collection<ListGameSingleResult> singleGameResults = new ArrayList<>();
+
+        for (GameData game : myGames) {
+            ListGameSingleResult singleGameResult = new ListGameSingleResult(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()
+            );
+            singleGameResults.add(singleGameResult);
+        }
+        ListGamesResult newListGamesResult = new ListGamesResult(singleGameResults);
+        return newListGamesResult;
+
+
     }
 }
