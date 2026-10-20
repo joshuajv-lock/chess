@@ -107,7 +107,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 //check diagonal for enemies
             //*if its the pawns second + move*/
             //it can move once:
-            //it can't move into its own piece
+            //it can't move into its own piec
             //check diagonal for enemies
 
 }
