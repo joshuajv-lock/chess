@@ -79,7 +79,9 @@ public class GameService {
         Collection<ListGameSingleResult> singleGameResults = new ArrayList<>();
 
         for (GameData game : myGames) {
-            ListGameSingleResult singleGameResult = new ListGameSingleResult(game.gameID(), game.whiteUsername(), game.blackUsername(), game.gameName()
+            ListGameSingleResult singleGameResult = new
+                    ListGameSingleResult(game.gameID(),
+                    game.whiteUsername(), game.blackUsername(), game.gameName()
             );
             singleGameResults.add(singleGameResult);
         }

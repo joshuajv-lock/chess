@@ -15,7 +15,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class GameServiceTest {
 
     @Test
-    public void CreateGameTest() throws Exception {
+    public void createGameTest() throws Exception {
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();
 

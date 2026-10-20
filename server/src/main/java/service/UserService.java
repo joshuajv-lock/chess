@@ -27,7 +27,9 @@ public class UserService {
         throws BadRequestException, AlreadyTakenException {
         //check userdata for user name
 
-        if (registerRequestObject == null || registerRequestObject.username() == null || registerRequestObject.password() == null || registerRequestObject.email() == null) {
+        if (registerRequestObject == null || registerRequestObject.username() == null
+                || registerRequestObject.password() == null
+                || registerRequestObject.email() == null) {
             throw new BadRequestException("Error: the given register information is incomplete");
         }
 
