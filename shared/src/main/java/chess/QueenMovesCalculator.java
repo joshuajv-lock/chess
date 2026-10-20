@@ -43,7 +43,9 @@ public class QueenMovesCalculator implements PieceMovesCalculator {
                             possibleMoves.add(new ChessMove(position, nextPosition, null));
                             distance += 1;
                         }
-                        else if (pieceInNextPosition.getTeamColor() !=null && pieceInNextPosition.getTeamColor() == board.getPiece(position).getTeamColor()) {
+                        else if (pieceInNextPosition.getTeamColor() !=null
+                                && pieceInNextPosition.getTeamColor() ==
+                                board.getPiece(position).getTeamColor()) {
 
                             expand = false;
 

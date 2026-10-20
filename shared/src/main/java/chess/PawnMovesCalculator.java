@@ -13,22 +13,18 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         this.board = board;
         this.position = position;
-
         Collection<ChessMove> possibleMoves = new ArrayList<>();
-
         //check pawn color
         int coef = 1;
         ChessPiece piece = board.getPiece(position);
-
         //piece is BLACK
         if (piece.getTeamColor() == ChessGame.TeamColor.BLACK) {
             coef = -1;
         }
             //piece promotion probably needs to go here
             // white on black end row and black on white end row
-
-        if ((position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
-
+        if ((position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                (position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
             //if space in front is open
             int moveOneRow = position.getRow() + 1 * coef;
             ChessPosition nextPositionOneMove = new ChessPosition(moveOneRow, position.getColumn());
@@ -43,7 +39,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 possibleMoves.add(new ChessMove(position, nextPositionTwoMoves, null));
             }
         }
-
         /*regular decision tree for a pawn*/
         //single move creation
         int moveOneRow = position.getRow() + 1 * coef;
@@ -51,53 +46,45 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
         ChessPiece pieceInNextPositionOneMove = board.getPiece(nextPositionOneMove);
         //add the move if its open
         if (pieceInNextPositionOneMove == null) {
-            if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
-
+            if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                    (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
                 //piece promotion
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.QUEEN));
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.KNIGHT));
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.ROOK));
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.BISHOP));
-                //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.PAWN));
-                //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KING));
-
             }
             else {
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, null));
             }
         }
-
-
                 // row +1 * coef and look at column + and -1
                 //needs to be within board
                 //can't be same team
                 //so different team and null is alright
 
         int[] nextColumns = {-1,1};
-
         for (int nextColumn : nextColumns) {
             int nextRow = position.getRow() + coef;
             int nextCol = position.getColumn() + nextColumn;
-
             if (nextRow <= 8 && nextCol <= 8 && nextRow >= 1 && nextCol >= 1) {
-                ChessPosition DiagPos = new ChessPosition(nextRow, nextCol);
-                if (board.getPiece(DiagPos) != null) {
-                    ChessPiece pieceInDiagPos = board.getPiece(DiagPos);
+                ChessPosition diagPos = new ChessPosition(nextRow, nextCol);
+                if (board.getPiece(diagPos) != null) {
+                    ChessPiece pieceIndiagPos = board.getPiece(diagPos);
 
-                    if (pieceInDiagPos.getTeamColor() != board.getPiece(position).getTeamColor()) {
+                    if (pieceIndiagPos.getTeamColor() != board.getPiece(position).getTeamColor()) {
                         //add the position
-                        if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) || (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+                        if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                                (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
 
                             //piece promotion
-                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.QUEEN));
-                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KNIGHT));
-                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.ROOK));
-                            possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.BISHOP));
-                            //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.PAWN));
-                            //possibleMoves.add(new ChessMove(position, DiagPos, ChessPiece.PieceType.KING));
+                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.QUEEN));
+                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.KNIGHT));
+                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.ROOK));
+                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.BISHOP));
 
                         }
-                        else {possibleMoves.add(new ChessMove(position, DiagPos, null));}
+                        else {possibleMoves.add(new ChessMove(position, diagPos, null));}
                     }
                     //for piece promotion
 
@@ -108,7 +95,6 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 } else {
                     continue;
                 }
-
             }
         }
         return  possibleMoves;
@@ -123,7 +109,5 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             //it can move once:
             //it can't move into its own piece
             //check diagonal for enemies
-
-
 
 }

@@ -1,15 +1,16 @@
 package service;
 
-import dataaccess.MemoryUserDAO;
-import dataaccess.MemoryAuthDAO;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 
 import model.AuthData;
 import model.UserData;
+import service.requests.LoginRequest;
+import service.requests.LogoutRequest;
+import service.requests.RegisterRequest;
+import service.results.LoginResult;
+import service.results.RegisterResult;
 
-import java.util.HashMap;
-import java.util.Map;
 import java.util.UUID;
 
 public class UserService {

@@ -3,6 +3,8 @@ package handler;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import service.*;
+import service.requests.ListGamesRequest;
+import service.results.ListGamesResult;
 
 import java.util.Map;
 

@@ -5,7 +5,6 @@ import handler.*;
 import io.javalin.*;
 import service.ClearService;
 import service.GameService;
-import service.LogoutRequest;
 import service.UserService;
 
 public class Server {

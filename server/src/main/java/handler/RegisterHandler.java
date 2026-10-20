@@ -2,8 +2,8 @@ package handler;
 
 import com.google.gson.Gson;
 import io.javalin.http.Context;
-import service.RegisterRequest;
-import service.RegisterResult;
+import service.requests.RegisterRequest;
+import service.results.RegisterResult;
 import service.UserService;
 import service.BadRequestException;
 import service.AlreadyTakenException;

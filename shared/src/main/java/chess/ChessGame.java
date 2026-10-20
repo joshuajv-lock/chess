@@ -187,7 +187,8 @@ public class ChessGame {
                 ChessPosition currentPosition = new ChessPosition(row, col);
                 if (myBoard.getPiece(currentPosition) != null) {
                     ChessPiece pieceToCheck = myBoard.getPiece(currentPosition);
-                    if (pieceToCheck.getPieceType() == ChessPiece.PieceType.KING && pieceToCheck.getTeamColor() == teamColor) {
+                    if (pieceToCheck.getPieceType() == ChessPiece.PieceType.KING
+                            && pieceToCheck.getTeamColor() == teamColor) {
                         ChessPosition kingPosition = currentPosition;
                         ChessPiece theKing = pieceToCheck;
                         //these are enemy pieces
@@ -200,7 +201,8 @@ public class ChessGame {
                                     ChessPiece pieceToCheckSub = myBoard.getPiece(currentPositionSub);
                                     if (pieceToCheckSub.getTeamColor() != teamColor) {
                                         //check its possible moves
-                                        Collection<ChessMove> otherTeamsPieceMoves = pieceToCheckSub.pieceMoves(myBoard,currentPositionSub);
+                                        Collection<ChessMove> otherTeamsPieceMoves =
+                                                pieceToCheckSub.pieceMoves(myBoard,currentPositionSub);
 
                                         for (ChessMove move : otherTeamsPieceMoves) {
                                             if (move.getEndPosition().equals(kingPosition)) {
@@ -212,7 +214,8 @@ public class ChessGame {
 
                             }
                         }
-                        //check and see if that current position exists in the rows of any of the other teams pices
+                        //check and see if that current position exists in
+                        // the rows of any of the other teams pices
                     }
                 }
 
@@ -221,7 +224,8 @@ public class ChessGame {
 
         //i need the state of the king of that color
         //
-        //would need to check the kings current position and see if its in any of the possible moves of the opposing teams pieces;
+        //would need to check the kings current position and see if
+        //its in any of the possible moves of the opposing teams pieces;
         return false;
     }
 

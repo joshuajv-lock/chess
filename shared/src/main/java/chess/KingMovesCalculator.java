@@ -40,7 +40,9 @@ public class KingMovesCalculator implements PieceMovesCalculator {
                         /*add to collection of moves*/
                         possibleMoves.add(new ChessMove(position, nextPosition, null));
                     }
-                    else if (pieceInNextPosition.getTeamColor() !=null && pieceInNextPosition.getTeamColor() == board.getPiece(position).getTeamColor()) {
+                    else if (pieceInNextPosition.getTeamColor() !=null
+                            && pieceInNextPosition.getTeamColor() ==
+                            board.getPiece(position).getTeamColor()) {
 
                         continue;
 

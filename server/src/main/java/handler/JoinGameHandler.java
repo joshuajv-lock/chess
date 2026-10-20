@@ -2,6 +2,7 @@ package handler;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import service.*;
+import service.requests.JoinGameRequest;
 
 import java.util.Map;
 public class JoinGameHandler {

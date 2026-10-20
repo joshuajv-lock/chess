@@ -2,11 +2,13 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import handler.JoinGameHandler;
 import model.AuthData;
 import model.GameData;
-import model.UserData;
 import org.junit.jupiter.api.Test;
+import service.requests.CreateGameRequest;
+import service.requests.JoinGameRequest;
+import service.requests.ListGamesRequest;
+import service.results.ListGamesResult;
 
 import static org.junit.jupiter.api.Assertions.*;
 

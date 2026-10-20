@@ -1,6 +1,4 @@
-package service;
-
-import model.AuthData;
+package service.results;
 
 public record RegisterResult (
         String username,

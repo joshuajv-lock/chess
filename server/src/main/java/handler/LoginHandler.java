@@ -4,6 +4,8 @@ package handler;
 import com.google.gson.Gson;
 import io.javalin.http.Context;
 import service.*;
+import service.requests.LoginRequest;
+import service.results.LoginResult;
 
 import java.util.Map;
 
