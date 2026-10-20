@@ -31,7 +31,6 @@ public class UserService {
         }
 
 
-
         String givenUsername = registerRequestObject.username();
         UserData possibleUser = userDAO.getUser(givenUsername);
 

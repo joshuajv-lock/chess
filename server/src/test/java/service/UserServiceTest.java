@@ -29,6 +29,21 @@ public class UserServiceTest {
 
         assertEquals("josh", result.username());
         assertNotNull(result.authToken());
+
+        assertThrows(
+                BadRequestException.class,
+                () -> userService.register(new RegisterRequest(
+                        null,
+                        "pass123",
+                        "josh@gmail.com")));
+        assertThrows(
+                AlreadyTakenException.class,
+                () -> userService.register(new RegisterRequest(
+                        "josh",
+                        "password",
+                        "email"))
+);
+
     }
 
     @Test
@@ -47,6 +62,16 @@ public class UserServiceTest {
 
         assertEquals("josh", result.username());
         assertNotNull(result.authToken());
+
+        assertThrows(
+                UnauthorizedException.class,
+                () -> userService.login(new LoginRequest("not-josh","password")));
+
+        assertThrows(
+                UnauthorizedException.class,
+                () -> userService.login(new LoginRequest("josh", "not-password")));
+
+
     }
 
     @Test
@@ -68,6 +93,7 @@ public class UserServiceTest {
         assertNull(authDAO.getAuth("example-authToken"));
 
         assertThrows(UnauthorizedException.class, () -> userService.logout(new LogoutRequest("fake-authToken")));
+
 
     }
 }
