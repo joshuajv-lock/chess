@@ -1,7 +1,7 @@
 package chess;
 
 import java.util.ArrayList;
-import java.util.List;
+
 import java.util.Collection;
 
 public class PawnMovesCalculator implements PieceMovesCalculator {
@@ -9,10 +9,40 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
     private ChessBoard board;
     private ChessPosition position;
 
+    private void addDiagonalCapture(Collection<ChessMove> possibleMoves, int nextRow, int nextCol, ChessPiece piece) {
+        if (nextRow > 8 || nextCol > 8 || nextRow < 1 || nextCol < 1) {
+            return;}
+        ChessPosition diagPos = new ChessPosition(nextRow, nextCol);
+        if (board.getPiece(diagPos) == null) {return;}
+
+        ChessPiece pieceInDiagPos = board.getPiece(diagPos);
+
+        if (pieceInDiagPos.getTeamColor() == piece.getTeamColor()) {
+            return;
+        }
+        //add the position
+        if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
+                (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
+
+            //piece promotion
+            addPromotionMoves(possibleMoves,diagPos);
+
+        }
+        else {possibleMoves.add(new ChessMove(position, diagPos, null));}
+    }
+
+    private void addPromotionMoves(Collection<ChessMove> possibleMoves, ChessPosition endPosition) {
+        possibleMoves.add(new ChessMove(position, endPosition, ChessPiece.PieceType.QUEEN));
+        possibleMoves.add(new ChessMove(position, endPosition, ChessPiece.PieceType.KNIGHT));
+        possibleMoves.add(new ChessMove(position, endPosition, ChessPiece.PieceType.ROOK));
+        possibleMoves.add(new ChessMove(position, endPosition, ChessPiece.PieceType.BISHOP));
+    }
+
     @Override
     public Collection<ChessMove> pieceMoves(ChessBoard board, ChessPosition position) {
         this.board = board;
         this.position = position;
+
         Collection<ChessMove> possibleMoves = new ArrayList<>();
         //check pawn color
         int coef = 1;
@@ -49,10 +79,7 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
             if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
                     (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
                 //piece promotion
-                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.QUEEN));
-                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.KNIGHT));
-                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.ROOK));
-                possibleMoves.add(new ChessMove(position, nextPositionOneMove, ChessPiece.PieceType.BISHOP));
+                addPromotionMoves(possibleMoves,nextPositionOneMove);
             }
             else {
                 possibleMoves.add(new ChessMove(position, nextPositionOneMove, null));
@@ -63,39 +90,19 @@ public class PawnMovesCalculator implements PieceMovesCalculator {
                 //can't be same team
                 //so different team and null is alright
 
+
+                    //for piece promotion
+
+                    //position holds is off the board, holds self, or is null
+
+
         int[] nextColumns = {-1,1};
         for (int nextColumn : nextColumns) {
             int nextRow = position.getRow() + coef;
             int nextCol = position.getColumn() + nextColumn;
-            if (nextRow <= 8 && nextCol <= 8 && nextRow >= 1 && nextCol >= 1) {
-                ChessPosition diagPos = new ChessPosition(nextRow, nextCol);
-                if (board.getPiece(diagPos) != null) {
-                    ChessPiece pieceIndiagPos = board.getPiece(diagPos);
+            addDiagonalCapture(possibleMoves,nextRow,nextCol,piece);
 
-                    if (pieceIndiagPos.getTeamColor() != board.getPiece(position).getTeamColor()) {
-                        //add the position
-                        if ((position.getRow() == 2 && piece.getTeamColor() == ChessGame.TeamColor.BLACK) ||
-                                (position.getRow() == 7 && piece.getTeamColor() == ChessGame.TeamColor.WHITE)) {
 
-                            //piece promotion
-                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.QUEEN));
-                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.KNIGHT));
-                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.ROOK));
-                            possibleMoves.add(new ChessMove(position, diagPos, ChessPiece.PieceType.BISHOP));
-
-                        }
-                        else {possibleMoves.add(new ChessMove(position, diagPos, null));}
-                    }
-                    //for piece promotion
-
-                    //position holds is off the board, holds self, or is null
-                    else {
-                        continue;
-                    }
-                } else {
-                    continue;
-                }
-            }
         }
         return  possibleMoves;
         }
