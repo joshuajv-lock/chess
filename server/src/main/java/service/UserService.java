@@ -1,5 +1,6 @@
 package service;
 
+import dataaccess.DataAccessException;
 import dataaccess.UserDAO;
 import dataaccess.AuthDAO;
 
@@ -24,7 +25,7 @@ public class UserService {
     }
 
     public RegisterResult register(RegisterRequest registerRequestObject)
-        throws BadRequestException, AlreadyTakenException {
+        throws BadRequestException, AlreadyTakenException, DataAccessException {
         //check userdata for user name
 
         if (registerRequestObject == null || registerRequestObject.username() == null
@@ -67,7 +68,7 @@ public class UserService {
         //turn authdata to registerresult
     }
 
-    public LoginResult login(LoginRequest loginRequestObject) throws BadRequestException, UnauthorizedException{
+    public LoginResult login(LoginRequest loginRequestObject) throws BadRequestException, UnauthorizedException, DataAccessException{
         if (loginRequestObject == null || loginRequestObject.username() == null || loginRequestObject.password() == null) {
             throw new BadRequestException("Error: the given login information is incomplete");
         }

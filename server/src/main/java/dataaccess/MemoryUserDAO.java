@@ -15,12 +15,12 @@ public class MemoryUserDAO implements UserDAO {
     };
 
     @Override
-    public void createUser(UserData userDataObject){
+    public void createUser(UserData userDataObject) {
         userStorage.put(userDataObject.username(), userDataObject);
     };
 
     @Override
-    public void clear(){
+    public void clear() {
         userStorage.clear();
     };
 }

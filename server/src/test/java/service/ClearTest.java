@@ -12,7 +12,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class ClearTest {
 
     @Test
-    public void clearTest() {
+    public void clearTest() throws DataAccessException {
         AuthDAO authDAO = new MemoryAuthDAO();
         GameDAO gameDAO = new MemoryGameDAO();
         UserDAO userDAO = new MemoryUserDAO();
