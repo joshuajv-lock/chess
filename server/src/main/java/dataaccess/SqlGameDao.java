@@ -3,13 +3,10 @@ package dataaccess;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import model.GameData;
-import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 
 public class SqlGameDao implements GameDAO{
 
@@ -23,8 +20,8 @@ public class SqlGameDao implements GameDAO{
         String sqlStatement = """
             CREATE TABLE IF NOT EXISTS games ( 
                 gameID INT PRIMARY KEY NOT NULL,
-                whiteUsername VARCHAR(256) NOT NULL,
-                blackUsername VARCHAR(256) NOT NULL,
+                whiteUsername VARCHAR(256),
+                blackUsername VARCHAR(256),
                 gameName VARCHAR(256) NOT NULL,
                 game TEXT NOT NULL
                 )
@@ -125,7 +122,6 @@ public class SqlGameDao implements GameDAO{
                     String obtainedGameName = obtainedInfo.getString("gameName");
                     String obtainedGameString = obtainedInfo.getString("game");
 
-
                     ChessGame obtainedGame =
                             gson.fromJson(obtainedGameString, ChessGame.class);
 
@@ -133,7 +129,6 @@ public class SqlGameDao implements GameDAO{
                 }
                 return gameList;
             }
-            return null;
         }   catch (SQLException e) {
             throw new DataAccessException(
                     "The info was not obtained from the table",
@@ -144,7 +139,39 @@ public class SqlGameDao implements GameDAO{
 
     @Override
     public GameData updateGame(GameData gameDataObject) throws DataAccessException{
-        return null;
+
+        String sqlStatement = """
+            UPDATE games
+            SET whiteUsername = ?,
+                blackUsername = ?,
+                gameName = ?,
+                game = ?
+            WHERE gameID = ?;
+            """;
+        try (var connection = DatabaseManager.getConnection();
+             var statement = connection.prepareStatement(sqlStatement)) {
+
+            statement.setString(1, gameDataObject.whiteUsername());
+            statement.setString(2, gameDataObject.blackUsername());
+            statement.setString(3, gameDataObject.gameName());
+            Gson gson = new Gson();
+            String gameInJson = gson.toJson(gameDataObject.game());
+            statement.setString(4, gameInJson);
+            statement.setInt(5, gameDataObject.gameID());
+
+            int gameUpdated = statement.executeUpdate();
+            if (gameUpdated == 0) {
+                throw new DataAccessException("Game not found");
+            }
+            return gameDataObject;
+        }
+        catch (SQLException e) {
+            throw new DataAccessException(
+                    "The info was not inserted into the table",
+                    e
+            );
+        }
+
     }
 
     @Override
