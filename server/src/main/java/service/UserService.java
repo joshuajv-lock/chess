@@ -94,7 +94,7 @@ public class UserService {
         }
 
     }
-    public void logout(LogoutRequest logoutRequestObject) throws UnauthorizedException {
+    public void logout(LogoutRequest logoutRequestObject) throws UnauthorizedException, DataAccessException {
         String authToken = logoutRequestObject.authToken();
         AuthData possibleAuth = authDAO.getAuth(authToken);
         if (possibleAuth == null) {

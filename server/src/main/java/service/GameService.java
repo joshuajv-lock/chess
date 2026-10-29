@@ -2,6 +2,7 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.AuthDAO;
+import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
@@ -29,7 +30,7 @@ public class GameService {
         this.gameDAO = gameDAO;
     }
 
-    public CreateGameResult createGame (CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException{
+    public CreateGameResult createGame (CreateGameRequest createGameRequest) throws UnauthorizedException, BadRequestException, DataAccessException {
         //authorize them
         if (createGameRequest == null) {
             throw new BadRequestException("Error: you must send a createGameRequest object");
@@ -61,7 +62,7 @@ public class GameService {
         //create the game
     }
 
-    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException, BadRequestException {
+    public ListGamesResult listGames(ListGamesRequest listGamesRequest) throws UnauthorizedException, BadRequestException, DataAccessException {
         if (listGamesRequest == null) {
             throw new BadRequestException("Error: you must send a listGamesRequest object");
         }
@@ -88,7 +89,7 @@ public class GameService {
         ListGamesResult newListGamesResult = new ListGamesResult(singleGameResults);
         return newListGamesResult;
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws BadRequestException, UnauthorizedException, AlreadyTakenException{
+    public void joinGame(JoinGameRequest joinGameRequest) throws BadRequestException, UnauthorizedException, AlreadyTakenException, DataAccessException{
         if (joinGameRequest == null) {
             throw new BadRequestException("Error: you must send a joinGameRequest object");
         }

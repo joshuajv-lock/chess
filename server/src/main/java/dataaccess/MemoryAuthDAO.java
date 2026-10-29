@@ -15,7 +15,7 @@ public class MemoryAuthDAO implements AuthDAO{
         authStorage.put(key,authDataObject);
     };
     @Override
-    public AuthData getAuth(String authToken) {
+    public AuthData getAuth(String authToken){
         AuthData authObjectToReturn = authStorage.get(authToken);
         return authObjectToReturn;
     };

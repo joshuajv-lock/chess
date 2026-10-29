@@ -31,6 +31,7 @@ public class SqlUserDaoTest{
             }
         }
     }
+
     @Test
     public void createUserTest() throws DataAccessException {
         UserData userData = new UserData("username", "password", "@email");
