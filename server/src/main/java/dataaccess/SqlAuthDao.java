@@ -1,8 +1,6 @@
 package dataaccess;
 
 import model.AuthData;
-import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
 
@@ -16,9 +14,9 @@ public class SqlAuthDao implements AuthDAO{
     private void configureDatabase() throws DataAccessException {
         //create the table if it doesn't exist
         String sqlStatement = """
-            CREATE TABLE IF NOT EXISTS users ( 
+            CREATE TABLE IF NOT EXISTS auths ( 
                 authToken VARCHAR(256) PRIMARY KEY NOT NULL,
-                username VARCHAR(256) NOT NULL,
+                username VARCHAR(256) NOT NULL
                 )
                 """;
 
@@ -46,7 +44,7 @@ public class SqlAuthDao implements AuthDAO{
         try (var connection = DatabaseManager.getConnection();
              var statement = connection.prepareStatement(sqlStatement)) {
             statement.setString(1, authData.authToken());
-            statement.setString(3, authData.username());
+            statement.setString(2, authData.username());
             statement.executeUpdate();
         }
         catch (SQLException e) {
