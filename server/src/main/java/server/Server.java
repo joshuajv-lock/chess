@@ -1,6 +1,9 @@
 package server;
 
 import dataaccess.*;
+import dataaccess.sql.SqlAuthDao;
+import dataaccess.sql.SqlGameDao;
+import dataaccess.sql.SqlUserDao;
 import handler.*;
 import io.javalin.*;
 import service.ClearService;

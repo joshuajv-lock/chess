@@ -2,6 +2,7 @@ package dataaccess;
 
 import chess.ChessGame;
 
+import dataaccess.sql.SqlGameDao;
 import model.GameData;
 
 import org.junit.jupiter.api.BeforeEach;
@@ -9,7 +10,6 @@ import org.junit.jupiter.api.Test;
 
 
 import java.util.ArrayList;
-import java.util.Collection;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;

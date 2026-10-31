@@ -89,7 +89,8 @@ public class GameService {
         ListGamesResult newListGamesResult = new ListGamesResult(singleGameResults);
         return newListGamesResult;
     }
-    public void joinGame(JoinGameRequest joinGameRequest) throws BadRequestException, UnauthorizedException, AlreadyTakenException, DataAccessException{
+    public void joinGame(JoinGameRequest joinGameRequest) throws BadRequestException, UnauthorizedException,
+            AlreadyTakenException, DataAccessException{
         if (joinGameRequest == null) {
             throw new BadRequestException("Error: you must send a joinGameRequest object");
         }
