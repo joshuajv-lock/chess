@@ -57,8 +57,7 @@ public class SqlAuthDaoTest {
         assertEquals("username", notDeletedAuth.username());
         assertEquals("authToken", notDeletedAuth.authToken());
 
-        assertNull(removedAuth2.authToken());
-        assertNull(removedAuth2.username());
+        assertNull(removedAuth2);
 
 
     }

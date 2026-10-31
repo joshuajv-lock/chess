@@ -6,6 +6,7 @@ import dataaccess.AuthDAO;
 
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -82,9 +83,12 @@ public class UserService {
         //is the password the one that matches the username?
 
         String givenPassword = loginRequestObject.password();
-        if (!givenPassword.equals(possibleUser.password())) {
+        if (possibleUser == null||
+                givenPassword == null ||
+                !BCrypt.checkpw(givenPassword, possibleUser.password())) {
             throw new UnauthorizedException("Error: the password doesn't match the one we have on file. would you like to recover your password?");
         }
+
         else {
             String authToken = UUID.randomUUID().toString();
             AuthData newAuth = new AuthData(authToken,givenUsername);

@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.*;
 import service.requests.CreateGameRequest;
@@ -16,7 +17,7 @@ public class CreateGameHandler {
         this.gameService = gameService;
     }
 
-    public void translate(Context ctx) {
+    public void translate(Context ctx) throws DataAccessException {
         String jsonText = ctx.body();
         String authToken = ctx.header("authorization");
         Gson gson = new Gson();
@@ -43,5 +44,10 @@ public class CreateGameHandler {
             ctx.status(400);
             ctx.result(gson.toJson(Map.of("message", e.getMessage())));
         }
+        catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.result(gson.toJson(Map.of("message","Error" + e.getMessage())));
+        }
+
     }
 }

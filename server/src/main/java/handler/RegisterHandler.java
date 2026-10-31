@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.requests.RegisterRequest;
 import service.results.RegisterResult;
@@ -18,7 +19,7 @@ private final UserService userService;
         this.userService = userService;
     }
 
-    public void translate(Context ctx) {
+    public void translate(Context ctx) throws DataAccessException {
         String jsonText = ctx.body();
         Gson gson = new Gson();
 
@@ -39,6 +40,11 @@ private final UserService userService;
             catch (AlreadyTakenException e) {
                 ctx.status(403);
                 ctx.result(gson.toJson(Map.of("message", e.getMessage())));
+            }
+
+            catch (DataAccessException e) {
+                ctx.status(500);
+                ctx.result(gson.toJson(Map.of("message","Error" + e.getMessage())));
             }
         }
     }

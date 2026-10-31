@@ -2,6 +2,7 @@ package handler;
 
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.*;
 import service.requests.LoginRequest;
@@ -16,7 +17,7 @@ public class LoginHandler {
         this.userService = userService;
     }
 
-    public void translate(Context ctx) {
+    public void translate(Context ctx) throws DataAccessException {
         String jsonText = ctx.body();
         Gson gson = new Gson();
 
@@ -37,6 +38,10 @@ public class LoginHandler {
         catch (UnauthorizedException e) {
             ctx.status(401);
             ctx.result(gson.toJson(Map.of("message", e.getMessage())));
+        }
+        catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.result(gson.toJson(Map.of("message","Error" + e.getMessage())));
         }
     }
 }

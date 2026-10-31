@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Test;
+import org.mindrot.jbcrypt.BCrypt;
 import service.requests.LoginRequest;
 import service.requests.LogoutRequest;
 import service.requests.RegisterRequest;
@@ -58,10 +59,14 @@ public class UserServiceTest {
 
         UserService userService = new UserService(userDAO,authDAO);
 
-        UserData userData = new UserData("josh","pass123", "josh@gmail.com");
+        String hashedPassword1 = BCrypt.hashpw("password1", BCrypt.gensalt());
+        String hashedPassword2 = BCrypt.hashpw("password2", BCrypt.gensalt());
+        String hashedPassword3 = BCrypt.hashpw("password3", BCrypt.gensalt());
+
+        UserData userData = new UserData("josh",hashedPassword1, "josh@gmail.com");
         userDAO.createUser(userData);
 
-        LoginRequest request = new LoginRequest("josh", "pass123");
+        LoginRequest request = new LoginRequest("josh", "password1");
 
         LoginResult result = userService.login(request);
 
@@ -70,11 +75,11 @@ public class UserServiceTest {
 
         assertThrows(
                 UnauthorizedException.class,
-                () -> userService.login(new LoginRequest("not-josh","password")));
+                () -> userService.login(new LoginRequest("not-josh",hashedPassword2)));
 
         assertThrows(
                 UnauthorizedException.class,
-                () -> userService.login(new LoginRequest("josh", "not-password")));
+                () -> userService.login(new LoginRequest("josh", hashedPassword3)));
 
 
     }

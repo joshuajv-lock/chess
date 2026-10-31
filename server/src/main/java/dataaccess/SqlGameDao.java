@@ -104,7 +104,7 @@ public class SqlGameDao implements GameDAO{
     @Override
     public Collection<GameData> listGames() throws DataAccessException{
         String sqlStatement = """
-            SELECT * FROM games;
+            SELECT * FROM games
             ORDER BY gameID ASC;
             """;
 

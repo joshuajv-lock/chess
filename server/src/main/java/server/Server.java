@@ -11,13 +11,13 @@ public class Server {
 
     private final Javalin javalin;
 
-    public Server() {
+    public Server() throws DataAccessException {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        UserDAO userDAO = new MemoryUserDAO();
-        AuthDAO authDAO = new MemoryAuthDAO();
-        GameDAO gameDAO = new MemoryGameDAO();
+        UserDAO userDAO = new SqlUserDao();
+        AuthDAO authDAO = new SqlAuthDao();
+        GameDAO gameDAO = new SqlGameDao();
 
         UserService userService = new UserService(userDAO,authDAO);
         GameService gameService = new GameService(authDAO,gameDAO);

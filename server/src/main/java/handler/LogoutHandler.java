@@ -1,6 +1,7 @@
 package handler;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 import io.javalin.http.Context;
 import service.*;
 import service.requests.LogoutRequest;
@@ -14,7 +15,7 @@ public class LogoutHandler {
         this.userService = userService;
     }
 
-    public void translate(Context ctx) {
+    public void translate(Context ctx) throws DataAccessException {
         String authToken = ctx.header("authorization");
         Gson gson = new Gson();
 
@@ -32,6 +33,10 @@ public class LogoutHandler {
         catch (UnauthorizedException e) {
             ctx.status(401);
             ctx.result(gson.toJson(Map.of("message", e.getMessage())));
+        }
+        catch (DataAccessException e) {
+            ctx.status(500);
+            ctx.result(gson.toJson(Map.of("message","Error" + e.getMessage())));
         }
     }
 }
