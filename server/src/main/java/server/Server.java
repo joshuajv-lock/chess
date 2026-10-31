@@ -11,44 +11,50 @@ public class Server {
 
     private final Javalin javalin;
 
-    public Server() throws DataAccessException {
+    public Server() {
         javalin = Javalin.create(config -> config.staticFiles.add("web"));
 
         // Register your endpoints and exception handlers here.
-        UserDAO userDAO = new SqlUserDao();
-        AuthDAO authDAO = new SqlAuthDao();
-        GameDAO gameDAO = new SqlGameDao();
+        try {
+            UserDAO userDAO = new SqlUserDao();
+            AuthDAO authDAO = new SqlAuthDao();
+            GameDAO gameDAO = new SqlGameDao();
 
-        UserService userService = new UserService(userDAO,authDAO);
-        GameService gameService = new GameService(authDAO,gameDAO);
-        ClearService clearService = new ClearService(authDAO,gameDAO,userDAO);
+            UserService userService = new UserService(userDAO,authDAO);
+            GameService gameService = new GameService(authDAO,gameDAO);
+            ClearService clearService = new ClearService(authDAO,gameDAO,userDAO);
 
-        RegisterHandler registerHandler = new RegisterHandler(userService);
+            RegisterHandler registerHandler = new RegisterHandler(userService);
 
-        javalin.post("/user", ctx -> registerHandler.translate(ctx));
+            javalin.post("/user", ctx -> registerHandler.translate(ctx));
 
-        LoginHandler loginHandler = new LoginHandler(userService);
+            LoginHandler loginHandler = new LoginHandler(userService);
 
-        javalin.post("/session", ctx -> loginHandler.translate(ctx));
+            javalin.post("/session", ctx -> loginHandler.translate(ctx));
 
-        LogoutHandler logoutHandler = new LogoutHandler(userService);
+            LogoutHandler logoutHandler = new LogoutHandler(userService);
 
-        javalin.delete("/session", ctx -> logoutHandler.translate(ctx));
+            javalin.delete("/session", ctx -> logoutHandler.translate(ctx));
 
-        CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
+            CreateGameHandler createGameHandler = new CreateGameHandler(gameService);
 
-        javalin.post("/game", ctx -> createGameHandler.translate(ctx));
+            javalin.post("/game", ctx -> createGameHandler.translate(ctx));
 
-        ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
+            ListGamesHandler listGamesHandler = new ListGamesHandler(gameService);
 
-        javalin.get("/game", ctx -> listGamesHandler.translate(ctx));
+            javalin.get("/game", ctx -> listGamesHandler.translate(ctx));
 
-        JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
+            JoinGameHandler joinGameHandler = new JoinGameHandler(gameService);
 
-        javalin.put("/game", ctx -> joinGameHandler.translate(ctx));
+            javalin.put("/game", ctx -> joinGameHandler.translate(ctx));
 
-        ClearHandler clearHandler = new ClearHandler(clearService);
-        javalin.delete("/db", ctx -> clearHandler.clear(ctx));
+            ClearHandler clearHandler = new ClearHandler(clearService);
+            javalin.delete("/db", ctx -> clearHandler.clear(ctx));
+        }
+        catch (DataAccessException e) {
+            throw new RuntimeException("Failed to start database", e);
+        }
+
 
     }
 
