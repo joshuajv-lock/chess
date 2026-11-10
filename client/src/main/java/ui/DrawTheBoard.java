@@ -39,9 +39,7 @@ public class DrawTheBoard {
         for (String col : columns) {
             out.print(" "+ col +" ");
         }
-        if (atTop == true) {
             out.println();
-        }
 
     }
 
