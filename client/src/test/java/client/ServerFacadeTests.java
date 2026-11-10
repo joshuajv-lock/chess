@@ -42,7 +42,7 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void RegisterToLogout() throws ResponseException {
+    void registerToLogout() throws ResponseException {
         //Register
         RegisterResult registerResult =
                 facade.register(new RegisterRequest(
