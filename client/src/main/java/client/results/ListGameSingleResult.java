@@ -6,4 +6,12 @@ public record ListGameSingleResult (
         String blackUsername,
         String gameName
 ){
+    @Override
+    public String toString() {
+        return  ", gameName='" + gameName + '\'' +
+                "whiteUsername='" + whiteUsername + '\'' +
+                ", blackUsername='" + blackUsername + '\'' +
+
+                '}';
+    }
 }

@@ -67,10 +67,10 @@ public class DrawTheBoard {
     private static void drawSquare(PrintStream out, int row, int col){
 
         if ((row + col) % 2 == 0) {
-            out.print(SET_BG_COLOR_DARK_GREEN);
+            out.print(SET_BG_COLOR_BLACK);
         }
         else {
-            out.print(SET_BG_COLOR_BLACK);
+            out.print(SET_BG_COLOR_GREEN);
         }
 
 
