@@ -9,5 +9,16 @@ package websocket.messages;
 // game informing them the root client connected to the game, either as a player
 // (in which case their color must be specified) or as an observer.
 
-public class NotificationMessage {
+public class NotificationMessage extends ServerMessage{
+
+    private String message;
+
+    public NotificationMessage(String message) {
+        super(ServerMessageType.NOTIFICATION);
+        this.message = message;
+    }
+
+    public String getMessage() {
+        return message;
+    }
 }

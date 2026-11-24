@@ -9,5 +9,19 @@ package websocket.commands;
 //Server sends a Notification message to all other clients in that game informing them what move was made.
 //If the move results in check, checkmate or stalemate the server sends a Notification message to all clients.
 
-public class MakeMoveCommand {
+import chess.ChessGame;
+import chess.ChessMove;
+
+public class MakeMoveCommand extends UserGameCommand{
+
+    private ChessMove move;
+
+    public MakeMoveCommand(String authToken, int gameID, ChessGame chessGame) {
+        super(CommandType.MAKE_MOVE, authToken, gameID);
+        this.move = move;
+    }
+
+    public ChessMove getMove() {
+        return move;
+    }
 }

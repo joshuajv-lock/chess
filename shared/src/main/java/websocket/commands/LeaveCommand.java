@@ -8,5 +8,9 @@ package websocket.commands;
 //Server sends a Notification message to all clients in that game informing them that
 //the root client resigned. This applies to both players and observers.
 
-public class LeaveCommand {
+public class LeaveCommand extends UserGameCommand{
+
+    public LeaveCommand(String authToken, int gameID) {
+        super(CommandType.LEAVE, authToken, gameID);
+    }
 }
