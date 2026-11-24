@@ -10,6 +10,7 @@ import io.javalin.websocket.WsMessageContext;
 import model.AuthData;
 import model.GameData;
 import websocket.commands.UserGameCommand;
+import websocket.messages.LoadGameMessage;
 
 public class WsHandler {
 
@@ -42,16 +43,20 @@ public class WsHandler {
             GameData gameData = gameDao.getGame(gameID);
             String username = authDAO.getAuth(authToken).username();
 
-
             if (gameData.blackUsername().equals(username)) {
-
+                System.out.println(username + "has been added as player BLACK");
             }
             else if (gameData.whiteUsername().equals(username)) {
-
+                System.out.println(username + "has been added as player WHITE");
             }
             else {
                 //observer
+                System.out.println(username + "has been added as an observer");
             }
+
+            LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+            String json = new Gson().toJson(gameMessage);
+            ctx.send(json);
 
         }
 
