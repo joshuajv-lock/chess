@@ -53,6 +53,21 @@ public class Server {
 
             ClearHandler clearHandler = new ClearHandler(clearService);
             javalin.delete("/db", ctx -> clearHandler.clear(ctx));
+
+            WsHandler wsHandler = new WsHandler(authDAO,gameDAO);
+
+            javalin.ws("/ws", ws -> {
+
+                ws.onConnect(ctx ->
+                        wsHandler.onConnect(ctx));
+
+                ws.onMessage(ctx ->
+                        wsHandler.onMessage(ctx));
+
+                ws.onClose(ctx ->
+                        wsHandler.onClose(ctx));
+            });
+
         }
         catch (DataAccessException e) {
             throw new RuntimeException("Failed to start database", e);
