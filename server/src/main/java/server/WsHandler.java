@@ -13,7 +13,9 @@ import model.AuthData;
 import model.GameData;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGameMessage;
+import websocket.messages.NotificationMessage;
 
 public class WsHandler {
 
@@ -29,6 +31,8 @@ public class WsHandler {
         System.out.println("WebSocket connected");
     }
 
+    private final ConnectionManager connectionManager = new ConnectionManager();
+
     public void onMessage(WsMessageContext ctx) throws DataAccessException, InvalidMoveException {
 
         UserGameCommand command = new
@@ -39,7 +43,8 @@ public class WsHandler {
 
             var authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                //throw DataAccessException;
+                ErrorMessage errorMessage = new ErrorMessage("Error: you are not authorized to execute that action");
+                ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
             String username = authData.username();
@@ -47,26 +52,41 @@ public class WsHandler {
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
             if (gameData == null) {
-                //throw new DataAccessException("that game doesn't exist", )
+                ErrorMessage errorMessage = new ErrorMessage("Error: that game does not exist");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
             }
+
+            String message;
 
 
             if (username.equals(gameData.blackUsername())) {
 
-                System.out.println(username + "connected as BLACK");
+                message = (username + " connected as BLACK");
             }
             else if (username.equals(gameData.whiteUsername())) {
 
-                System.out.println(username + " connected as WHITE");
+                message = (username + " connected as WHITE");
             }
             else {
                 //observer
-                System.out.println(username + "connected as an observer");
+                message = (username + " connected as an observer");
             }
 
-            LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-            String json = new Gson().toJson(gameMessage);
-            ctx.send(json);
+
+            Connection connection = new Connection();
+            connection.username=username;
+            connection.ctx = ctx;
+            connection.gameID = gameID;
+
+            connectionManager.addConnection(connection);
+
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
+            ctx.send(new Gson().toJson(loadGameMessage));
+
+            NotificationMessage notificationMessage = new NotificationMessage(message);
+            String notificationJson = new Gson().toJson(notificationMessage);
+            connectionManager.sendWithoutReception(notificationJson,connection);
 
         }
 
