@@ -128,6 +128,25 @@ public class WsHandler {
                 return;
             }
 
+            //correct team turn
+            ChessGame.TeamColor playerTeamColor = null;
+            if (username.equals(gameData.blackUsername())) {
+                playerTeamColor = ChessGame.TeamColor.BLACK;
+            }
+            if (username.equals(gameData.whiteUsername())) {
+                playerTeamColor = ChessGame.TeamColor.WHITE;
+            }
+
+
+
+            if (!game.getTeamTurn().equals(playerTeamColor)){
+                ErrorMessage errorMessage = new ErrorMessage("Error: " +
+                        "it is not your turn and therefore you cannot make that move");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
+
 
 
             //update game
