@@ -122,18 +122,21 @@ public class WsHandler {
                     ctx.send(new Gson().toJson(errorMessage));
                     return;
             }
-            if (username != gameData.whiteUsername() && username != gameData.blackUsername()) {
+            if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
                 ErrorMessage errorMessage = new ErrorMessage("Error: observers cannot make moves");
                 ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
+
+
+
             //update game
             //make move
             game.makeMove(move);
             GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
             gameDao.updateGame(updatedGameWithMove);
 
-            Connection connection =
+            Connection connection = connectionManager.getConnection(ctx);
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
             String loadGameString = new Gson().toJson(loadGameMessage);

@@ -36,7 +36,7 @@ public class ConnectionManager {
 
     public Connection getConnection(WsContext ctx) {
         for (Connection myConnection : myConnections) {
-            if(myConnection.ctx == ctx){
+            if(myConnection.ctx.session == ctx.session){
                 return myConnection;
             }
         }
