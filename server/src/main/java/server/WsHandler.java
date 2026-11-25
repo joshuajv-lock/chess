@@ -41,12 +41,14 @@ public class WsHandler {
             }
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
-            String username = authDAO.getAuth(authToken).username();
+            String username = authData.username();
 
-            if (gameData.blackUsername().equals(username)) {
+            if (username.equals(gameData.blackUsername())) {
+
                 System.out.println(username + "has been added as player BLACK");
             }
-            else if (gameData.whiteUsername().equals(username)) {
+            else if (username.equals(gameData.whiteUsername())) {
+
                 System.out.println(username + "has been added as player WHITE");
             }
             else {
@@ -54,19 +56,99 @@ public class WsHandler {
                 System.out.println(username + "has been added as an observer");
             }
 
-            LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-            String json = new Gson().toJson(gameMessage);
-            ctx.send(json);
+            if (gameData.game() == null) {
+                //throw an error
+            }
+            else {
+                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+                String json = new Gson().toJson(gameMessage);
+                ctx.send(json);
+            }
+
 
         }
 
-        if (command.equals(UserGameCommand.CommandType.MAKE_MOVE)) {
+        if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
         }
 
-        if (command.equals(UserGameCommand.CommandType.RESIGN)) {
+        if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
+            String authToken = command.getAuthToken();
+
+            var authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                //throw DataAccessException;
+                return;
+            }
+            int gameID = command.getGameID();
+            GameData gameData = gameDao.getGame(gameID);
+            String username = authData.username();
+            String gameName = gameData.gameName();
+            ChessGame game = gameData.game();
+
+            if (username.equals(gameData.blackUsername())) {
+                //end game
+                String opponentUsername = gameData.whiteUsername();
+                System.out.println(username + "has resigned the game and "+ opponentUsername+ " wins the game");
+
+            }
+            else if (username.equals(gameData.whiteUsername())) {
+                //end game
+                String opponentUsername = gameData.blackUsername();
+                System.out.println(username + "has resigned the game and "+ opponentUsername+ " wins the game");
+            }
+            else {
+                //observer
+                System.out.println(username + "is no longer observing the game");
+            }
+
+            if (gameData.game() == null) {
+                //throw an error
+            }
+            else {
+                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+                String json = new Gson().toJson(gameMessage);
+                ctx.send(json);
+            }
         }
 
-        if (command.equals(UserGameCommand.CommandType.LEAVE)) {
+        if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
+            String authToken = command.getAuthToken();
+
+            var authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                //throw DataAccessException;
+                return;
+            }
+            int gameID = command.getGameID();
+            GameData gameData = gameDao.getGame(gameID);
+            String username = authData.username();
+            String gameName = gameData.gameName();
+            ChessGame game = gameData.game();
+
+            if (username.equals(gameData.blackUsername())) {
+                GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), null, gameName, game);
+                gameDao.updateGame(updatedGameData);
+                System.out.println(username + "has left the game and there is no longer a BLACK player");
+
+            }
+            else if (username.equals(gameData.whiteUsername())) {
+                GameData updatedGameData = new GameData(gameID, null, gameData.blackUsername(), gameName, game);
+                gameDao.updateGame(updatedGameData);
+                System.out.println(username + "has left the game and there is no longer a WHITE player");
+            }
+            else {
+                //observer
+                System.out.println(username + "is no longer observing the game");
+            }
+
+            if (gameData.game() == null) {
+                //throw an error
+            }
+            else {
+                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+                String json = new Gson().toJson(gameMessage);
+                ctx.send(json);
+            }
         }
 
         System.out.println("WebSocket Message: " + ctx.message());

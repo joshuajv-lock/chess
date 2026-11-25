@@ -8,4 +8,4 @@ public record GameData (
     String blackUsername,
     String gameName,
     ChessGame game
-) {}
+){}
