@@ -1,5 +1,7 @@
 package server;
 
+import io.javalin.websocket.WsContext;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -30,6 +32,15 @@ public class ConnectionManager {
                 myConnection.ctx.send(message);
             }
         }
+    }
+
+    public Connection getConnection(WsContext ctx) {
+        for (Connection myConnection : myConnections) {
+            if(myConnection.ctx == ctx){
+                return myConnection;
+            }
+        }
+        return null;
     }
 
 }

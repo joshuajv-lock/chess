@@ -33,6 +33,7 @@ public class WsHandler {
 
     private final ConnectionManager connectionManager = new ConnectionManager();
 
+
     public void onMessage(WsMessageContext ctx) throws DataAccessException, InvalidMoveException {
 
         UserGameCommand command = new
@@ -73,8 +74,8 @@ public class WsHandler {
                 message = (username + " connected as an observer");
             }
 
-
             Connection connection = new Connection();
+
             connection.username=username;
             connection.ctx = ctx;
             connection.gameID = gameID;
@@ -101,6 +102,13 @@ public class WsHandler {
 
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
+
+            if (gameData == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: that game does not exist");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
             String username = authData.username();
             String gameName = gameData.gameName();
             ChessGame game = gameData.game();
@@ -109,38 +117,36 @@ public class WsHandler {
                     Gson().fromJson(ctx.message(), MakeMoveCommand.class);
             ChessMove move = makeMoveCommand.getMove();
 
-
+            if (move == null) {
+                    ErrorMessage errorMessage = new ErrorMessage("Error: that move does not exist");
+                    ctx.send(new Gson().toJson(errorMessage));
+                    return;
+            }
+            if (username != gameData.whiteUsername() && username != gameData.blackUsername()) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: observers cannot make moves");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
             //update game
-            if (gameData.game() == null) {
-                //throw an error
-            }
-            else {
+            //make move
+            game.makeMove(move);
+            GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
+            gameDao.updateGame(updatedGameWithMove);
 
-                if (move == null) {
-                    //throw error
-                }
-                else {
-                    //make move
-                    game.makeMove(move);
-                    LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-                    String json = new Gson().toJson(gameMessage);
-                    ctx.send(json);
-                }
+            Connection connection =
 
-            }
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
+            String loadGameString = new Gson().toJson(loadGameMessage);
+            connectionManager.broadcast(loadGameString,connection);
 
             //send message
-            if (username.equals(gameData.blackUsername())) {
-                System.out.println(username + "has executed: "+ move+ "as their move");
 
-            }
-            else if (username.equals(gameData.whiteUsername())) {
-                System.out.println(username + "has executed: "+ move+ "as their move");
-            }
-            else {
-                System.out.println(username + "has executed: "+ move+ "as their move");;
-            }
+           String message = (username + "has executed: "+ move+ "as their move");
 
+
+           NotificationMessage notificationMessage = new NotificationMessage(message);
+           String notificationJson = new Gson().toJson(notificationMessage);
+           connectionManager.sendWithoutReception(notificationJson,connection);
 
         }
 
