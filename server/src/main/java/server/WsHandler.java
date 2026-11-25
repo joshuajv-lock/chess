@@ -146,16 +146,32 @@ public class WsHandler {
                 return;
             }
 
-
-
-
             //update game
             //make move
-            game.makeMove(move);
+
+
+            try {
+                game.makeMove(move);
+            } catch (InvalidMoveException e) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: " +
+                        "the move you tried to make does not seem to be a valid move. It may be out of bounds" +
+                        "or unallowed");
+                ctx.send(new Gson().toJson(errorMessage));
+
+                return;
+            }
+
             GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
             gameDao.updateGame(updatedGameWithMove);
 
             Connection connection = connectionManager.getConnection(ctx);
+
+            if (connection == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
+                ctx.send(new Gson().toJson(errorMessage));
+
+                return;
+            }
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
             String loadGameString = new Gson().toJson(loadGameMessage);
