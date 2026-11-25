@@ -1,5 +1,7 @@
 package server;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.InvalidMoveException;
 import com.google.gson.Gson;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
@@ -9,6 +11,7 @@ import io.javalin.websocket.WsConnectContext;
 import io.javalin.websocket.WsMessageContext;
 import model.AuthData;
 import model.GameData;
+import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.LoadGameMessage;
 
@@ -26,7 +29,7 @@ public class WsHandler {
         System.out.println("WebSocket connected");
     }
 
-    public void onMessage(WsMessageContext ctx) throws DataAccessException {
+    public void onMessage(WsMessageContext ctx) throws DataAccessException, InvalidMoveException {
 
         UserGameCommand command = new
                  Gson().fromJson(ctx.message(), UserGameCommand.class);
@@ -39,36 +42,86 @@ public class WsHandler {
                 //throw DataAccessException;
                 return;
             }
+            String username = authData.username();
+
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
-            String username = authData.username();
+            if (gameData == null) {
+                //throw new DataAccessException("that game doesn't exist", )
+            }
+
 
             if (username.equals(gameData.blackUsername())) {
 
-                System.out.println(username + "has been added as player BLACK");
+                System.out.println(username + "connected as BLACK");
             }
             else if (username.equals(gameData.whiteUsername())) {
 
-                System.out.println(username + "has been added as player WHITE");
+                System.out.println(username + " connected as WHITE");
             }
             else {
                 //observer
-                System.out.println(username + "has been added as an observer");
+                System.out.println(username + "connected as an observer");
             }
 
-            if (gameData.game() == null) {
-                //throw an error
-            }
-            else {
-                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-                String json = new Gson().toJson(gameMessage);
-                ctx.send(json);
-            }
-
+            LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+            String json = new Gson().toJson(gameMessage);
+            ctx.send(json);
 
         }
 
         if (command.getCommandType() == UserGameCommand.CommandType.MAKE_MOVE) {
+            String authToken = command.getAuthToken();
+
+            var authData = authDAO.getAuth(authToken);
+            if (authData == null) {
+                //throw DataAccessException;
+                return;
+            }
+
+            int gameID = command.getGameID();
+            GameData gameData = gameDao.getGame(gameID);
+            String username = authData.username();
+            String gameName = gameData.gameName();
+            ChessGame game = gameData.game();
+
+            MakeMoveCommand makeMoveCommand = new
+                    Gson().fromJson(ctx.message(), MakeMoveCommand.class);
+            ChessMove move = makeMoveCommand.getMove();
+
+
+            //update game
+            if (gameData.game() == null) {
+                //throw an error
+            }
+            else {
+
+                if (move == null) {
+                    //throw error
+                }
+                else {
+                    //make move
+                    game.makeMove(move);
+                    LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
+                    String json = new Gson().toJson(gameMessage);
+                    ctx.send(json);
+                }
+
+            }
+
+            //send message
+            if (username.equals(gameData.blackUsername())) {
+                System.out.println(username + "has executed: "+ move+ "as their move");
+
+            }
+            else if (username.equals(gameData.whiteUsername())) {
+                System.out.println(username + "has executed: "+ move+ "as their move");
+            }
+            else {
+                System.out.println(username + "has executed: "+ move+ "as their move");;
+            }
+
+
         }
 
         if (command.getCommandType() == UserGameCommand.CommandType.RESIGN) {
@@ -101,14 +154,6 @@ public class WsHandler {
                 System.out.println(username + "is no longer observing the game");
             }
 
-            if (gameData.game() == null) {
-                //throw an error
-            }
-            else {
-                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-                String json = new Gson().toJson(gameMessage);
-                ctx.send(json);
-            }
         }
 
         if (command.getCommandType() == UserGameCommand.CommandType.LEAVE) {
@@ -141,14 +186,6 @@ public class WsHandler {
                 System.out.println(username + "is no longer observing the game");
             }
 
-            if (gameData.game() == null) {
-                //throw an error
-            }
-            else {
-                LoadGameMessage gameMessage = new LoadGameMessage(gameData.game());
-                String json = new Gson().toJson(gameMessage);
-                ctx.send(json);
-            }
         }
 
         System.out.println("WebSocket Message: " + ctx.message());
