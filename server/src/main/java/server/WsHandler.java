@@ -252,30 +252,54 @@ public class WsHandler {
 
             var authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                //throw DataAccessException;
+                ErrorMessage errorMessage = new ErrorMessage("Error: you are unauthorized to leave");
+                ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
+
+            if (gameData == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: that game does not exist");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
             String username = authData.username();
             String gameName = gameData.gameName();
             ChessGame game = gameData.game();
 
+            Connection connection = connectionManager.getConnection(ctx);
+
+            if (connection == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
+            connectionManager.removeConnection(connection);
+
+            String message;
+
             if (username.equals(gameData.blackUsername())) {
                 GameData updatedGameData = new GameData(gameID, gameData.whiteUsername(), null, gameName, game);
                 gameDao.updateGame(updatedGameData);
-                System.out.println(username + "has left the game and there is no longer a BLACK player");
+                message = username + " has left the game and there is no longer a BLACK player";
 
             }
             else if (username.equals(gameData.whiteUsername())) {
                 GameData updatedGameData = new GameData(gameID, null, gameData.blackUsername(), gameName, game);
                 gameDao.updateGame(updatedGameData);
-                System.out.println(username + "has left the game and there is no longer a WHITE player");
+                message = username + " has left the game and there is no longer a WHITE player";
             }
             else {
                 //observer
-                System.out.println(username + "is no longer observing the game");
+                message = username + " is no longer observing the game";
             }
+
+            NotificationMessage notificationMessage = new NotificationMessage(message);
+            String notificationJson = new Gson().toJson(notificationMessage);
+            connectionManager.sendWithoutReception(notificationJson,connection);
 
         }
 
