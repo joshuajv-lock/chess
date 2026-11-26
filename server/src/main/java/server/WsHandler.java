@@ -171,18 +171,8 @@ public class WsHandler {
                 return;
             }
 
-
-            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
-            String loadGameString = new Gson().toJson(loadGameMessage);
-            connectionManager.broadcast(loadGameString,connection);
-
             //send message
 
-           String message = (username + "has executed: "+ move+ "as their move");
-
-            NotificationMessage notificationMessage = new NotificationMessage(message);
-            String notificationJson = new Gson().toJson(notificationMessage);
-            connectionManager.sendWithoutReception(notificationJson,connection);
 
            String colorInDanger = "";
            String dangerScenario = "";
@@ -214,17 +204,27 @@ public class WsHandler {
                 dangerScenario = "is in Stalemate";
                 game.setGameOver(true);
             }
-            if (!colorInDanger.equals("")) {
-                message = message + colorInDanger + dangerScenario;
-            }
 
             GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
             gameDao.updateGame(updatedGameWithMove);
 
+            LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
+            String loadGameString = new Gson().toJson(loadGameMessage);
+            connectionManager.broadcast(loadGameString,connection);
 
-           NotificationMessage notificationMessageConditional = new NotificationMessage(message);
-           String notificationJsonConditional = new Gson().toJson(notificationMessageConditional);
-           connectionManager.broadcast(notificationJsonConditional,connection);
+            String message = (username + " has executed: "+ move+ " as their move");
+
+            NotificationMessage notificationMessage = new NotificationMessage(message);
+            String notificationJson = new Gson().toJson(notificationMessage);
+            connectionManager.sendWithoutReception(notificationJson,connection);
+
+            String conditionalMessage;
+            if (!colorInDanger.equals("")) {
+                conditionalMessage = colorInDanger +" "+ dangerScenario;
+                NotificationMessage notificationMessageConditional = new NotificationMessage(conditionalMessage);
+                String notificationJsonConditional = new Gson().toJson(notificationMessageConditional);
+                connectionManager.broadcast(notificationJsonConditional,connection);
+            }
 
         }
 
@@ -354,7 +354,27 @@ public class WsHandler {
     }
 
     public void onClose(WsCloseContext ctx){
-        System.out.println("WebSocket closed");
+
+        UserGameCommand command = new
+                Gson().fromJson(ctx., UserGameCommand.class);
+
+        String authToken = command.getAuthToken();
+
+        var authData = authDAO.getAuth(authToken);
+        if (authData == null) {
+            ErrorMessage errorMessage = new ErrorMessage("Error: you are unauthorized to leave");
+            ctx.send(new Gson().toJson(errorMessage));
+            return;
+        }
+
+        Connection connection = connectionManager.getConnection(ctx);
+        connectionManager.removeConnection(connection);
+
+        String message = "Websocket closed";
+
+        NotificationMessage notificationMessage = new NotificationMessage(message);
+        String notificationJson = new Gson().toJson(notificationMessage);
+        connectionManager.broadcast(notificationJson,connection);
     }
 
 }
