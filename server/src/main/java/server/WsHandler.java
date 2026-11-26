@@ -136,20 +136,14 @@ public class WsHandler {
             if (username.equals(gameData.whiteUsername())) {
                 playerTeamColor = ChessGame.TeamColor.WHITE;
             }
-
-
-
             if (!game.getTeamTurn().equals(playerTeamColor)){
                 ErrorMessage errorMessage = new ErrorMessage("Error: " +
                         "it is not your turn and therefore you cannot make that move");
                 ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
-
             //update game
             //make move
-
-
             try {
                 game.makeMove(move);
             } catch (InvalidMoveException e) {
@@ -169,7 +163,6 @@ public class WsHandler {
             if (connection == null) {
                 ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
                 ctx.send(new Gson().toJson(errorMessage));
-
                 return;
             }
 
@@ -193,30 +186,64 @@ public class WsHandler {
 
             var authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                //throw DataAccessException;
+                ErrorMessage errorMessage = new ErrorMessage("Error: you are not authorized to resign");
+                ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
+
             int gameID = command.getGameID();
             GameData gameData = gameDao.getGame(gameID);
+
+            if (gameData == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: that game does not exist");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
             String username = authData.username();
             String gameName = gameData.gameName();
             ChessGame game = gameData.game();
 
+            if (!username.equals(gameData.whiteUsername()) && !username.equals(gameData.blackUsername())) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: observers cannot resign");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
+            if (game.isGameOver()){
+                ErrorMessage errorMessage = new ErrorMessage("Error: " +
+                        "you cannot resign the game is already over");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
+            String opponentUsername = "";
             if (username.equals(gameData.blackUsername())) {
                 //end game
-                String opponentUsername = gameData.whiteUsername();
-                System.out.println(username + "has resigned the game and "+ opponentUsername+ " wins the game");
+                opponentUsername = gameData.whiteUsername();
 
             }
-            else if (username.equals(gameData.whiteUsername())) {
+            if (username.equals(gameData.whiteUsername())) {
                 //end game
-                String opponentUsername = gameData.blackUsername();
-                System.out.println(username + "has resigned the game and "+ opponentUsername+ " wins the game");
+                opponentUsername = gameData.blackUsername();
             }
-            else {
-                //observer
-                System.out.println(username + "is no longer observing the game");
+            String message = username + " has resigned the game and "+ opponentUsername+ " wins the game";
+
+            Connection connection = connectionManager.getConnection(ctx);
+
+            if (connection == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
             }
+
+            game.setGameOver(true);
+            GameData updatedGameDataObject = new GameData(gameID,gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
+            gameDao.updateGame(updatedGameDataObject);
+
+            NotificationMessage notificationMessage = new NotificationMessage(message);
+            String notificationJson = new Gson().toJson(notificationMessage);
+            connectionManager.broadcast(notificationJson,connection);
 
         }
 

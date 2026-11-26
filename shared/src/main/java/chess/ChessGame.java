@@ -279,6 +279,21 @@ public class ChessGame {
     }
 
     /**
+     * Sets whether the game is over.
+     *
+     * @param gameOver true if the game is over, false otherwise
+     */
+    private boolean gameOver = false;
+
+    public boolean isGameOver() {
+        return gameOver;
+    }
+
+    public void setGameOver(boolean gameOver) {
+        this.gameOver = gameOver;
+    }
+
+    /**
      * Sets this game's chessboard to a given board
      *
      * @param board the new board to use
