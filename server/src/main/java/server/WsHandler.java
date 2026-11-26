@@ -96,7 +96,8 @@ public class WsHandler {
 
             var authData = authDAO.getAuth(authToken);
             if (authData == null) {
-                //throw DataAccessException;
+                ErrorMessage errorMessage = new ErrorMessage("Error: you are not authorized to execute that action");
+                ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
 
@@ -142,6 +143,21 @@ public class WsHandler {
                 ctx.send(new Gson().toJson(errorMessage));
                 return;
             }
+
+            Connection connection = connectionManager.getConnection(ctx);
+
+            if (connection == null) {
+                ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
+
+            if (game.isGameOver()){
+                ErrorMessage errorMessage = new ErrorMessage("Error: " +
+                        "you cannot make a move, the game is already over");
+                ctx.send(new Gson().toJson(errorMessage));
+                return;
+            }
             //update game
             //make move
             try {
@@ -155,16 +171,6 @@ public class WsHandler {
                 return;
             }
 
-            GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
-            gameDao.updateGame(updatedGameWithMove);
-
-            Connection connection = connectionManager.getConnection(ctx);
-
-            if (connection == null) {
-                ErrorMessage errorMessage = new ErrorMessage("Error: this client is not connected to the game");
-                ctx.send(new Gson().toJson(errorMessage));
-                return;
-            }
 
             LoadGameMessage loadGameMessage = new LoadGameMessage(gameData.game());
             String loadGameString = new Gson().toJson(loadGameMessage);
@@ -174,10 +180,51 @@ public class WsHandler {
 
            String message = (username + "has executed: "+ move+ "as their move");
 
+            NotificationMessage notificationMessage = new NotificationMessage(message);
+            String notificationJson = new Gson().toJson(notificationMessage);
+            connectionManager.sendWithoutReception(notificationJson,connection);
 
-           NotificationMessage notificationMessage = new NotificationMessage(message);
-           String notificationJson = new Gson().toJson(notificationMessage);
-           connectionManager.sendWithoutReception(notificationJson,connection);
+           String colorInDanger = "";
+           String dangerScenario = "";
+           if (game.isInCheck(ChessGame.TeamColor.WHITE)) {
+                colorInDanger = "WHITE";
+                dangerScenario = "is in Check";
+           }
+           if (game.isInCheck(ChessGame.TeamColor.BLACK)) {
+                colorInDanger = "BLACK";
+                dangerScenario = "is in Check";
+           }
+            if (game.isInCheckmate(ChessGame.TeamColor.BLACK)) {
+                colorInDanger = "BLACK";
+                dangerScenario = "is in Checkmate";
+                game.setGameOver(true);
+            }
+            if (game.isInCheckmate(ChessGame.TeamColor.WHITE)) {
+                colorInDanger = "WHITE";
+                dangerScenario = "is in Checkmate";
+                game.setGameOver(true);
+            }
+            if (game.isInStalemate(ChessGame.TeamColor.BLACK)) {
+                colorInDanger = "BLACK";
+                dangerScenario = "is in Stalemate";
+                game.setGameOver(true);
+            }
+            if (game.isInStalemate(ChessGame.TeamColor.WHITE)) {
+                colorInDanger = "WHITE";
+                dangerScenario = "is in Stalemate";
+                game.setGameOver(true);
+            }
+            if (!colorInDanger.equals("")) {
+                message = message + colorInDanger + dangerScenario;
+            }
+
+            GameData updatedGameWithMove = new GameData(gameID, gameData.whiteUsername(),gameData.blackUsername(),gameName,game);
+            gameDao.updateGame(updatedGameWithMove);
+
+
+           NotificationMessage notificationMessageConditional = new NotificationMessage(message);
+           String notificationJsonConditional = new Gson().toJson(notificationMessageConditional);
+           connectionManager.broadcast(notificationJsonConditional,connection);
 
         }
 
