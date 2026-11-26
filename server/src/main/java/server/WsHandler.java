@@ -355,26 +355,11 @@ public class WsHandler {
 
     public void onClose(WsCloseContext ctx){
 
-        UserGameCommand command = new
-                Gson().fromJson(ctx., UserGameCommand.class);
-
-        String authToken = command.getAuthToken();
-
-        var authData = authDAO.getAuth(authToken);
-        if (authData == null) {
-            ErrorMessage errorMessage = new ErrorMessage("Error: you are unauthorized to leave");
-            ctx.send(new Gson().toJson(errorMessage));
-            return;
-        }
-
         Connection connection = connectionManager.getConnection(ctx);
-        connectionManager.removeConnection(connection);
 
-        String message = "Websocket closed";
-
-        NotificationMessage notificationMessage = new NotificationMessage(message);
-        String notificationJson = new Gson().toJson(notificationMessage);
-        connectionManager.broadcast(notificationJson,connection);
+        if (connection!= null){
+            connectionManager.removeConnection(connection);
+        }
     }
 
 }
