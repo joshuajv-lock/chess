@@ -1,0 +1,36 @@
+To Do:
+
+1. Install MySQL add MySQL JDBC and BCrypt dependencies
+
+2. Design Schema: create tables that can store the UserData, AuthData, and GameData
+	-Create the tables if they don't already exist
+	-so i probably need a create and add method
+
+-What does each table need?
+
+User:
+	-username should be the key to get the data object
+	-password
+	-email
+Auth
+	-authtoken should be the key to get the data object
+	-username 
+Game
+	-GameID
+	-whiteusername
+	-blackusername
+	-Game Name
+
+
+3. Create SQL implementations of existing DAO interfaces
+	-SQLUserDAO
+	-SQL AuthDAO
+	-SQLGameDAO
+		-The SQL implementations should implement same methods of memory DAOs
+
+4. test each method individually
+
+5. store passwords as BCrypt hashes rather than plain text
+6. serialize and deserialize ChessGame object when storing and deserializing
+
+7. Run Tests
